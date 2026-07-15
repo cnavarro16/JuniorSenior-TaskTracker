@@ -1,5 +1,4 @@
 ﻿using EasyConsole;
-using System.Security.Cryptography;
 using TaskTracker.Cli.Models;
 
 namespace TaskTracker.Cli.Helpers
