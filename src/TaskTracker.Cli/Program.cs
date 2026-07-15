@@ -18,7 +18,7 @@ internal class Program
         while (true);
     }
 
-    private static List<string> SeedTasks()
+    static List<string> SeedTasks()
     {
         List<string> tasks = new List<string>();
         tasks.Add("[%PENDING%] Test Task 1 (Due: 28/9/26)");
@@ -27,7 +27,7 @@ internal class Program
         return tasks;
     }
 
-    private static void ShowMenu()
+    static void ShowMenu()
     {
         var menu = """
             Task Manager v1.0
@@ -44,20 +44,20 @@ internal class Program
         Console.Write(menu);
     }
 
-    private static void AddTask(List<string> tasks)
+    static void AddTask(List<string> tasks)
     {
         Console.Clear();
         Console.Write("Enter a task description: ");
         var taskDescription = Console.ReadLine();
         Console.Write("Enter a task due date: ");
         var taskDueDate = Console.ReadLine();
-        Console.WriteLine($"\nAdding {taskDescription} to task list, with due date of {taskDueDate}");
-        tasks.Add($"[%PENDING%] {taskDescription} (Due: {taskDueDate})");
+        tasks.Add($"[%PENDING%] {taskDescription} (Due: {taskDueDate?.Replace("-","/")})");
+        Console.WriteLine($"\nTask added to task list...");
         Console.WriteLine("\nPress ENTER to return to main menu...");
         Console.ReadLine();
     }
 
-    private static void ListTasks(List<string> tasks)
+    static void ListTasks(List<string> tasks)
     {
         Console.Clear();
         ShowTasks(tasks);
@@ -65,7 +65,7 @@ internal class Program
         Console.ReadLine();
     }
 
-    private static void MarkTaskComplete(List<string> tasks)
+    static void MarkTaskComplete(List<string> tasks)
     {
         Console.Clear();
         ShowTasks(tasks);
@@ -80,18 +80,26 @@ internal class Program
         ListTasks(tasks);
     }
 
-    private static void ShowTasks(List<string> tasks)
+    static void ShowTasks(List<string> tasks)
     {
-        Console.WriteLine("Task List:");
-        var i = 0;
-        foreach (var task in tasks)
+        if(tasks.Any())
         {
-            i++;
-            Console.WriteLine($"{i} - {task.Replace("%PENDING%", " ")}");
+            Console.WriteLine("Task List:");
+            var i = 0;
+            foreach (var task in tasks)
+            {
+                i++;
+                Console.WriteLine($"{i} - {task.Replace("%PENDING%", " ")}");
+            }
         }
+        else
+        {
+            Console.WriteLine("No tasks in the system...");
+        }
+        
     }
 
-    public static void GoToScreen(string? choice, List<string> tasks)
+    static void GoToScreen(string? choice, List<string> tasks)
     {
         switch (choice)
         {
@@ -113,7 +121,7 @@ internal class Program
         }
     }
 
-    private static void ExitApp()
+    static void ExitApp()
     {
         Environment.Exit(0);
     }
