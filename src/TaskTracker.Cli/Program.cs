@@ -6,6 +6,7 @@ internal class Program
     {
         bool seedTasks = false;
         string? choice = string.Empty;
+        bool running = true;
         List<string> tasks = seedTasks ? SeedTasks() : new List<string>();
 
         do
@@ -13,9 +14,9 @@ internal class Program
             Console.Clear();
             ShowMenu();
             choice = Console.ReadLine();
-            GoToScreen(choice, tasks);
+            running = GoToScreen(choice, tasks);
         }
-        while (true);
+        while (running);
     }
 
     static List<string> SeedTasks()
@@ -99,30 +100,24 @@ internal class Program
         
     }
 
-    static void GoToScreen(string? choice, List<string> tasks)
+    static bool GoToScreen(string? choice, List<string> tasks)
     {
         switch (choice)
         {
             case "1":
                 AddTask(tasks);
-                break;
+                return true;
             case "2":
-                ListTasks(tasks); 
-                break;
+                ListTasks(tasks);
+                return true;
             case "3":
                 MarkTaskComplete(tasks);
-                break;
+                return true;
             case "4":
-                ExitApp();
-                break;
+                return false;
             default:
                 ShowMenu();
-                break;
+                return true;
         }
-    }
-
-    static void ExitApp()
-    {
-        Environment.Exit(0);
     }
 }
