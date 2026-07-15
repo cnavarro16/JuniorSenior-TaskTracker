@@ -1,123 +1,33 @@
-﻿namespace TaskTracker.Cli;
+﻿using EasyConsole;
+using Microsoft.Extensions.Configuration;
+using TaskTracker.Cli.Helpers;
+using TaskTracker.Cli.Models;
+
+namespace TaskTracker.Cli;
 
 internal class Program
 {
     static void Main(string[] args)
     {
-        bool seedTasks = false;
-        string? choice = string.Empty;
-        bool running = true;
-        List<string> tasks = seedTasks ? SeedTasks() : new List<string>();
+        IConfiguration config = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .Build();
 
+        bool seedTasks = config.GetValue<bool>("SeedTasks");
+        bool running = true;
+        
+        List<TaskItem> tasks = seedTasks ? TaskHelper.SeedTasks() : new List<TaskItem>();
+
+        var menu = new Menu()
+            .Add("Add a Task", () => TaskHelper.AddTask(tasks))
+            .Add("List all tasks", () => TaskHelper.ListTasks(tasks))
+            .Add("Mark a task as complete", () => TaskHelper.MarkTaskComplete(tasks))
+            .Add("Exit", () => { running = false; });
         do
         {
             Console.Clear();
-            ShowMenu();
-            choice = Console.ReadLine();
-            running = GoToScreen(choice, tasks);
+            menu.Display();
         }
         while (running);
-    }
-
-    static List<string> SeedTasks()
-    {
-        List<string> tasks = new List<string>();
-        tasks.Add("[%PENDING%] Test Task 1 (Due: 28/9/26)");
-        tasks.Add("[%PENDING%] Test Task 2 (Due: 20/9/26)");
-        tasks.Add("[%PENDING%] Test Task 3 (Due: 20/1/27)");
-        return tasks;
-    }
-
-    static void ShowMenu()
-    {
-        var menu = """
-            Task Manager v1.0
-
-            Available Functionality:
-            1. Add a task
-            2. List all tasks
-            3. Mark a task as complete
-            4. Exit
-
-            Please enter a selection: 
-            """;
-        Console.Clear();
-        Console.Write(menu);
-    }
-
-    static void AddTask(List<string> tasks)
-    {
-        Console.Clear();
-        Console.Write("Enter a task description: ");
-        var taskDescription = Console.ReadLine();
-        Console.Write("Enter a task due date: ");
-        var taskDueDate = Console.ReadLine();
-        tasks.Add($"[%PENDING%] {taskDescription} (Due: {taskDueDate?.Replace("-","/")})");
-        Console.WriteLine($"\nTask added to task list...");
-        Console.WriteLine("\nPress ENTER to return to main menu...");
-        Console.ReadLine();
-    }
-
-    static void ListTasks(List<string> tasks)
-    {
-        Console.Clear();
-        ShowTasks(tasks);
-        Console.WriteLine("\nPress ENTER to return to main menu...");
-        Console.ReadLine();
-    }
-
-    static void MarkTaskComplete(List<string> tasks)
-    {
-        Console.Clear();
-        ShowTasks(tasks);
-        Console.Write("Enter id for task to mark as complete: ");
-        var choice = Console.ReadLine();
-        var id = int.Parse(choice) - 1;
-        var task = tasks[id];
-        if (task.Contains("%PENDING%"))
-        {
-            tasks[id] = task.Replace("%PENDING%", "X");
-        }
-        ListTasks(tasks);
-    }
-
-    static void ShowTasks(List<string> tasks)
-    {
-        if(tasks.Any())
-        {
-            Console.WriteLine("Task List:");
-            var i = 0;
-            foreach (var task in tasks)
-            {
-                i++;
-                Console.WriteLine($"{i} - {task.Replace("%PENDING%", " ")}");
-            }
-        }
-        else
-        {
-            Console.WriteLine("No tasks in the system...");
-        }
-        
-    }
-
-    static bool GoToScreen(string? choice, List<string> tasks)
-    {
-        switch (choice)
-        {
-            case "1":
-                AddTask(tasks);
-                return true;
-            case "2":
-                ListTasks(tasks);
-                return true;
-            case "3":
-                MarkTaskComplete(tasks);
-                return true;
-            case "4":
-                return false;
-            default:
-                ShowMenu();
-                return true;
-        }
     }
 }
