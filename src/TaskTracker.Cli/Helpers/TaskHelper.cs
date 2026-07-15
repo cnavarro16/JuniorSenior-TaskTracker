@@ -8,25 +8,12 @@ namespace TaskTracker.Cli.Helpers
     {
         public static List<TaskItem> SeedTasks()
         {
-            var tasks = new List<TaskItem>();
-            tasks.Add(new TaskItem()
+            var tasks = new List<TaskItem>
             {
-                Description = "Test Task 1",
-                DueDate = DateTime.Now.AddDays(20),
-                IsCompleted = false
-            });
-            tasks.Add(new TaskItem()
-            {
-                Description = "Test Task 2",
-                DueDate = DateTime.Now.AddDays(5),
-                IsCompleted = false
-            });
-            tasks.Add(new TaskItem()
-            {
-                Description = "Test Task 3",
-                DueDate = DateTime.Now.AddDays(50),
-                IsCompleted = false
-            });
+                new TaskItem("Test Task 1", DateTime.Now.AddDays(20)),
+                new TaskItem("Test Task 2", DateTime.Now.AddDays(50)),
+                new TaskItem("Test Task 3", DateTime.Now.AddDays(35))
+            };
             return tasks;
         }
 
@@ -56,13 +43,7 @@ namespace TaskTracker.Cli.Helpers
             }
             while (!dateIsValid);
 
-            tasks.Add(new TaskItem()
-            {
-                Description = taskDescription,
-                DueDate = dateValue,
-                IsCompleted = false
-            });
-
+            tasks.Add(new TaskItem(taskDescription, dateValue));
             Console.WriteLine($"\nTask added to task list...");
             ShowReturnToMenuText();
         }
@@ -96,14 +77,20 @@ namespace TaskTracker.Cli.Helpers
         {
             Console.Clear();
             GetTaskList(tasks);
-            Console.Write("Enter id for task to mark as complete: ");
-            var choice = Console.ReadLine();
+            var choice = string.Empty;
+
+            do
+            {
+                Console.Write("\nEnter id for task to mark as complete: ");
+                choice = Console.ReadLine();
+                if (string.IsNullOrEmpty(choice))
+                    Output.WriteLine(ConsoleColor.Red, "No task id provided, please try again...");
+            }
+            while (string.IsNullOrEmpty(choice));
+
             var id = int.Parse(choice) - 1;
             var task = tasks[id];
-            if (!task.IsCompleted)
-            {
-                task.IsCompleted = true;
-            }
+            task.MarkComplete();
             ListTasks(tasks);
         }
 
