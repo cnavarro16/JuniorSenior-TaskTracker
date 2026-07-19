@@ -1,13 +1,26 @@
-﻿namespace TaskTracker.Cli.Models;
+﻿using TaskTracker.Cli.Enums;
+
+namespace TaskTracker.Cli.Models;
 
 public class TaskItem
 {
-	public TaskItem(string description, DateTime dueDate, bool isCompleted = false)
+	public TaskItem(int id, string description, DateTime dueDate, PriorityLevel priority, bool isCompleted = false)
 	{
+		_id = id;
 		_description = description;
 		_dueDate = dueDate;
+		_priority = priority;
 		_isCompleted = isCompleted;
 	}
+
+	private int _id;
+
+	public int Id
+	{
+		get { return _id; }
+		init { _id = value; }
+	}
+
 
 	private string _description;
 
@@ -39,5 +52,13 @@ public class TaskItem
 		{
 			IsCompleted = true;
 		}
+	}
+
+	private PriorityLevel _priority;
+
+	public PriorityLevel Priority
+	{
+		get { return _priority; }
+		set { _priority = value; }
 	}
 }

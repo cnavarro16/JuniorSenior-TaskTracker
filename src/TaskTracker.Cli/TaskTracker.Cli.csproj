@@ -8,7 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EasyConsole" Version="1.1.0" />
+	<PackageReference Include="EasyConsole" Version="1.1.0">
+		<NoWarn>NU1701</NoWarn> <!-- Not concerned about shim being used; ok to ignore this warning to reduce noise.-->
+	</PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.10" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.10" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.10" />

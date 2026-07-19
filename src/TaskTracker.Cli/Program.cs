@@ -22,6 +22,7 @@ internal class Program
             .Add("Add a Task", () => TaskHelper.AddTask(tasks))
             .Add("List all tasks", () => TaskHelper.ListTasks(tasks))
             .Add("Mark a task as complete", () => TaskHelper.MarkTaskComplete(tasks))
+            .Add("Delete a Task", () => TaskHelper.DeleteTask(tasks))
             .Add("Exit", () => { running = false; });
         do
         {
@@ -29,5 +30,7 @@ internal class Program
             menu.Display();
         }
         while (running);
+
+        // TODO: Say hello to SonarQube for Visual Studio!
     }
 }

@@ -1,4 +1,5 @@
 ﻿using EasyConsole;
+using TaskTracker.Cli.Enums;
 using TaskTracker.Cli.Models;
 
 namespace TaskTracker.Cli.Helpers
@@ -9,9 +10,9 @@ namespace TaskTracker.Cli.Helpers
         {
             var tasks = new List<TaskItem>
             {
-                new TaskItem("Test Task 1", DateTime.Now.AddDays(20)),
-                new TaskItem("Test Task 2", DateTime.Now.AddDays(50)),
-                new TaskItem("Test Task 3", DateTime.Now.AddDays(35))
+                new TaskItem(1, "Test Task 1", DateTime.Now.AddDays(20), PriorityLevel.High),
+                new TaskItem(2, "Test Task 2", DateTime.Now.AddDays(50), PriorityLevel.Medium),
+                new TaskItem(3, "Test Task 3", DateTime.Now.AddDays(35), PriorityLevel.Low)
             };
             return tasks;
         }
@@ -22,6 +23,7 @@ namespace TaskTracker.Cli.Helpers
             DateTime dateValue;
             Console.Clear();
             var taskDescription = string.Empty;
+            var priorityInput = string.Empty;
 
             do
             {
@@ -42,7 +44,24 @@ namespace TaskTracker.Cli.Helpers
             }
             while (!dateIsValid);
 
-            tasks.Add(new TaskItem(taskDescription, dateValue));
+            do
+            {
+                Console.WriteLine("\nSelect a priority level:");
+                Console.WriteLine("1. Low");
+                Console.WriteLine("2. Medium");
+                Console.WriteLine("3. High");
+                Console.Write("Enter your choice (1-3): ");
+                priorityInput = Console.ReadLine();
+                if (string.IsNullOrEmpty(priorityInput))
+                    Output.WriteLine(ConsoleColor.Red, "No priority level provided, please try again...");
+            }
+            while (string.IsNullOrEmpty(priorityInput));
+
+            var numbericChoice = int.Parse(priorityInput); // Assuming valid value
+            var priorityLevel = (PriorityLevel)numbericChoice; // Assuming enum value exists
+
+            tasks.Add(new TaskItem(GetNextId(tasks), taskDescription, dateValue, priorityLevel));
+            
             Console.WriteLine($"\nTask added to task list...");
             ShowReturnToMenuText();
         }
@@ -52,12 +71,10 @@ namespace TaskTracker.Cli.Helpers
             if (tasks.Any())
             {
                 Console.WriteLine("Task List:");
-                var i = 0;
                 foreach (var task in tasks)
                 {
-                    i++;
                     var checkbox = task.IsCompleted ? "[X]" : "[ ]";
-                    Console.WriteLine($"{i} - {checkbox} {task.Description} (Due Date: {task.DueDate.ToString("dd-MM-yy")})");
+                    Console.WriteLine($"{task.Id} - {checkbox} {task.Description} (Due Date: {task.DueDate.ToString("dd-MM-yy")} | Priority: {task.Priority})");
                 }
             }
             else
@@ -86,17 +103,70 @@ namespace TaskTracker.Cli.Helpers
                     Output.WriteLine(ConsoleColor.Red, "No task id provided, please try again...");
             }
             while (string.IsNullOrEmpty(choice));
+            
 
-            var id = int.Parse(choice) - 1;
-            var task = tasks[id];
-            task.MarkComplete();
-            ListTasks(tasks);
+            var taskId = int.Parse(choice); // Assuming valid value
+            var task = tasks.FirstOrDefault(t => t.Id == taskId);
+
+            if (task != null)
+            {
+                task.MarkComplete();
+                Console.Clear();
+                GetTaskList(tasks);
+                Console.WriteLine($"\nTask marked as completed...");
+            }
+            else
+            {
+                Console.WriteLine($"Task {taskId} does not exist...");
+            }
+
+            ShowReturnToMenuText();
+        }
+
+        public static void DeleteTask(List<TaskItem> tasks)
+        {
+            Console.Clear();
+            GetTaskList(tasks);
+            var choice = string.Empty;
+
+            do
+            {
+                Console.Write("\nEnter id for task to delete: ");
+                choice = Console.ReadLine();
+                if (string.IsNullOrEmpty(choice))
+                    Output.WriteLine(ConsoleColor.Red, "No task id provided, please try again...");
+            }
+            while (string.IsNullOrEmpty(choice));
+
+
+            var taskId = int.Parse(choice); // Assuming valid value
+            var task = tasks.FirstOrDefault(t => t.Id == taskId);
+            if(task != null)
+            {
+                tasks.Remove(task);
+                Console.WriteLine($"Task {taskId} has been removed...");
+            }
+            else
+            {
+                Console.WriteLine($"Task {taskId} does not exist...");
+            }
+            
+            ShowReturnToMenuText();
         }
 
         private static void ShowReturnToMenuText()
         {
             Console.WriteLine("\nPress ENTER to return to main menu...");
             Console.ReadLine();
+        }
+
+        private static int GetNextId(List<TaskItem> tasks)
+        {
+            if (!tasks.Any())
+                return 1;
+
+            var topTaskId = tasks.OrderByDescending(t => t.Id).Select(i => i.Id).FirstOrDefault();
+            return topTaskId + 1;
         }
     }
 }
