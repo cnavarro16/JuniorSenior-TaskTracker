@@ -165,7 +165,7 @@ namespace TaskTracker.Cli.Helpers
             if (!tasks.Any())
                 return 1;
 
-            var topTaskId = tasks.OrderByDescending(t => t.Id).Select(i => i.Id).FirstOrDefault();
+            var topTaskId = tasks.Max(t => t.Id);
             return topTaskId + 1;
         }
     }
